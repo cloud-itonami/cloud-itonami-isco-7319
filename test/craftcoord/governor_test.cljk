@@ -1,5 +1,5 @@
 (ns craftcoord.governor-test
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [kotoba.test :refer [deftest is testing]]
             [craftcoord.store :as store]
             [craftcoord.advisor :as advisor]
             [craftcoord.governor :as governor]))
