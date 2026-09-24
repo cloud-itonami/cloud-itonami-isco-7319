@@ -1,5 +1,5 @@
 (ns craftcoord.actor-test
-  (:require [clojure.test :refer [deftest is testing]]
+  (:require [kotoba.test :refer [deftest is testing]]
             [craftcoord.actor :as actor]
             [craftcoord.store :as store]))
 
