@@ -1,0 +1,41 @@
+;; What this vertical's robot physically does, declared for
+;; kotoba.robotics.process (kotoba-lang/robotics). `kbb -M:physics` runs it.
+;;
+;; README "Robotics premise": a workshop scheduling/logistics coordination
+;; robot handles crew scheduling, job/commission records and craft-materials
+;; supply orders for a handicraft workshop crew (ISCO 7319, handicraft workers
+;; not elsewhere classified). Its physical work: hauling craft materials to the
+;; benches, shelving crates of finished pieces, and draining the dye/wash vat.
+;;
+;; Every number without a cited source is marked `estimate` in its :basis.
+;; Replacing an estimate with a sourced value is this bot's growth work.
+{:physics/schema "itonami.physical-ai.spec.v1"
+ :repo "cloud-itonami/cloud-itonami-isco-7319"
+ :cases
+ [{:id :materials-to-benches
+   :kind :transport
+   :procedure "cart hauls craft materials (clay, wax, fibre, board) from the store to the workbenches"
+   :params {:mass-kg 50.0 :distance-m 25.0 :v-max-mps 1.0 :a-max-mps2 0.5
+            :brake-decel-mps2 0.8 :drive-force-n 110.0 :crr 0.02
+            :cog-height-m 0.45 :support-half-length-m 0.30 :max-time-s 1200.0}
+   :sweep {:param :payload-kg :values [10.0 40.0 80.0 150.0 250.0]}
+   :quantity :cycle-time-s
+   :limit {:max 40.0 :basis "estimate: one store-to-bench leg between work orders"}
+   :boundary {:lo 5.0 :hi 800.0}}
+  {:id :crate-onto-shelf
+   :kind :manipulator
+   :procedure "arm lifts a crate of finished craft pieces from the cart top onto the stock shelf"
+   :params {:l1-m 0.50 :l2-m 0.45 :m1-kg 5.0 :m2-kg 4.0
+            :from [0.55 0.10] :to [0.40 0.75] :duration-s 3.0 :steps 500}
+   :sweep {:param :payload-kg :values [1.0 3.0 5.0 8.0 12.0]}
+   :quantity :peak-tau1-nm
+   :limit {:max 60.0 :basis "estimate: continuous shoulder torque of a light collaborative arm (~5 kg class)"}
+   :boundary {:lo 0.1 :hi 30.0}}
+  {:id :dye-vat-drain
+   :kind :tank-drain
+   :procedure "dye/wash vat (0.8 m2, 0.6 m deep) drains through its bottom valve before the next colour"
+   :params {:tank-area-m2 0.8 :h0-m 0.60 :h-target-m 0.02 :cd 0.62 :q-in-m3s 0.0}
+   :sweep {:param :orifice-area-m2 :values [0.0002 0.0005 0.0010 0.0020 0.0030]}
+   :quantity :time-to-target-s
+   :limit {:max 900.0 :basis "estimate: colour change inside a 15-minute slot"}
+   :boundary {:lo 0.0001 :hi 0.005}}]}
